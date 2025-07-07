@@ -377,6 +377,144 @@ class BaseYii
         throw new InvalidConfigException('Object configuration must be an array containing a "class" or "__class" element.');
     }
 
+    private static $_logger;
+
+    /**
+     * @return Logger message logger
+     */
+    public static function getLogger()
+    {
+        if (self::$_logger !== null) {
+            return self::$_logger;
+        }
+
+        return self::$_logger = static::createObject('yii\log\Logger');
+    }
+
+    /**
+     * Sets the logger object.
+     * @param Logger|null $logger the logger object.
+     */
+    public static function setLogger($logger)
+    {
+        self::$_logger = $logger;
+    }
+
+    /**
+     * Logs a debug message.
+     * Trace messages are logged mainly for development purposes to see
+     * the execution workflow of some code. This method will only log
+     * a message when the application is in debug mode.
+     * @param string|array $message the message to be logged. This can be a simple string or a more
+     * complex data structure, such as an array.
+     * @param string $category the category of the message.
+     * @since 2.0.14
+     */
+    public static function debug($message, $category = 'application')
+    {
+        if (YII_DEBUG) {
+            static::getLogger()->log($message, Logger::LEVEL_TRACE, $category);
+        }
+    }
+
+    /**
+     * Alias of [[debug()]].
+     * @param string|array $message the message to be logged. This can be a simple string or a more
+     * complex data structure, such as an array.
+     * @param string $category the category of the message.
+     * @deprecated since 2.0.14. Use [[debug()]] instead.
+     */
+    public static function trace($message, $category = 'application')
+    {
+        static::debug($message, $category);
+    }
+
+    /**
+     * Logs an error message.
+     * An error message is typically logged when an unrecoverable error occurs
+     * during the execution of an application.
+     * @param string|array $message the message to be logged. This can be a simple string or a more
+     * complex data structure, such as an array.
+     * @param string $category the category of the message.
+     */
+    public static function error($message, $category = 'application')
+    {
+        static::getLogger()->log($message, Logger::LEVEL_ERROR, $category);
+    }
+
+    /**
+     * Logs a warning message.
+     * A warning message is typically logged when an error occurs while the execution
+     * can still continue.
+     * @param string|array $message the message to be logged. This can be a simple string or a more
+     * complex data structure, such as an array.
+     * @param string $category the category of the message.
+     */
+    public static function warning($message, $category = 'application')
+    {
+        static::getLogger()->log($message, Logger::LEVEL_WARNING, $category);
+    }
+
+    /**
+     * Logs an informative message.
+     * An informative message is typically logged by an application to keep record of
+     * something important (e.g. an administrator logs in).
+     * @param string|array $message the message to be logged. This can be a simple string or a more
+     * complex data structure, such as an array.
+     * @param string $category the category of the message.
+     */
+    public static function info($message, $category = 'application')
+    {
+        static::getLogger()->log($message, Logger::LEVEL_INFO, $category);
+    }
+
+    /**
+     * Marks the beginning of a code block for profiling.
+     *
+     * This has to be matched with a call to [[endProfile]] with the same category name.
+     * The begin- and end- calls must also be properly nested. For example,
+     *
+     * ```php
+     * \Yii::beginProfile('block1');
+     * // some code to be profiled
+     *     \Yii::beginProfile('block2');
+     *     // some other code to be profiled
+     *     \Yii::endProfile('block2');
+     * \Yii::endProfile('block1');
+     * ```
+     * @param string $token token for the code block
+     * @param string $category the category of this log message
+     * @see endProfile()
+     */
+    public static function beginProfile($token, $category = 'application')
+    {
+        static::getLogger()->log($token, Logger::LEVEL_PROFILE_BEGIN, $category);
+    }
+
+    /**
+     * Marks the end of a code block for profiling.
+     * This has to be matched with a previous call to [[beginProfile]] with the same category name.
+     * @param string $token token for the code block
+     * @param string $category the category of this log message
+     * @see beginProfile()
+     */
+    public static function endProfile($token, $category = 'application')
+    {
+        static::getLogger()->log($token, Logger::LEVEL_PROFILE_END, $category);
+    }
+
+    /**
+     * Returns an HTML hyperlink that can be displayed on your Web page showing "Powered by Yii Framework" information.
+     * @return string an HTML hyperlink that can be displayed on your Web page showing "Powered by Yii Framework" information
+     * @deprecated since 2.0.14, this method will be removed in 2.1.0.
+     */
+    public static function powered()
+    {
+        return \Yii::t('yii', 'Powered by {yii}', [
+            'yii' => '<a href="https://www.yiiframework.com/" rel="external">' . \Yii::t('yii', 'Yii Framework') . '</a>',
+        ]);
+    }
+
 
 
 }
