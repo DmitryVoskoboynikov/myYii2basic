@@ -515,6 +515,70 @@ class BaseYii
         ]);
     }
 
+    /**
+     * Translates a message to the specified language.
+     *
+     * This is a shortcut method of [[\yii\i18n\I18N::translate()]].
+     *
+     * The translation will be conducted according to the message category and the target language will be used.
+     *
+     * You can add parameters to a translation message that will be substituted with the corresponding value after
+     * translation. The format for this is to use curly brackets around the parameter name as you can see in the following example:
+     *
+     * ```php
+     * $username = 'Alexander';
+     * echo \Yii::t('app', 'Hello, {username}!', ['username' => $username]);
+     * ```
+     *
+     * Further formatting of message parameters is supported using the [PHP intl extensions](https://www.php.net/manual/en/intro.intl.php)
+     * message formatter. See [[\yii\i18n\I18N::translate()]] for more details.
+     *
+     * @param string $category the message category.
+     * @param string $message the message to be translated.
+     * @param array $params the parameters that will be used to replace the corresponding placeholders in the message.
+     * @param string|null $language the language code (e.g. `en-US`, `en`). If this is null, the current
+     * [[\yii\base\Application::language|application language]] will be used.
+     * @return string the translated message.
+     */
+    public static function t($category, $message, $params = [], $language = null)
+    {
+        if (static::$app !== null) {
+            return static::$app->getI18n()->translate($category, $message, $params, $language ?: static::$app->language);
+        }
 
+        $placeholders = [];
+        foreach ((array) $params as $name => $value) {
+            $placeholders['{' . $name . '}'] = $value;
+        }
 
+        return ($placeholders === []) ? $message : strtr($message, $placeholders);
+    }
+
+    /**
+     * Configures an object with the initial property values.
+     * @param object $object the object to be configured
+     * @param array $properties the property initial values given in terms of name-value pairs.
+     * @return object the object itself
+     */
+    public static function configure($object, $properties)
+    {
+        foreach ($properties as $name => $value) {
+            $object->$name = $value;
+        }
+
+        return $object;
+    }
+
+    /**
+     * Returns the public member variables of an object.
+     * This method is provided such that we can get the public member variables of an object.
+     * It is different from "get_object_vars()" because the latter will return private
+     * and protected variables if it is called within the object itself.
+     * @param object $object the object to be handled
+     * @return array the public member variables of the object
+     */
+    public static function getObjectVars($object)
+    {
+        return get_object_vars($object);
+    }
 }
